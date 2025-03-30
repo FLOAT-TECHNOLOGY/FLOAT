@@ -12706,18 +12706,12 @@ section.u-image:not(.u-hover-box),
     transform: translateY(-50%);
   }
 }
-.u-header.u-sticky {
-  position: fixed;
-  top: 0;
+
 }
-@supports (position: sticky) {
-  .u-header.u-sticky {
-    position: sticky;
+
   }
 }
-@supports (position: -webkit-sticky) {
-  .u-header.u-sticky {
-    position: -webkit-sticky;
+
   }
 }
 .u-sticky {
@@ -12737,8 +12731,7 @@ section.u-image:not(.u-hover-box),
   z-index: 20;
   padding-top: 0.1px;
 }
-.u-overlap .u-header.u-sticky {
-  position: fixed;
+
 }
 .u-overlap.u-overlap-transparent .u-header {
   background-color: transparent !important;
