@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>F.L.O.A.T. Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: 'Segoe UI', sans-serif;
+        background-color: #000000;
+        background-size: cover;
+        color: white;
+      }
+
+      h2 {
+        text-align: center;
+        color: #00bcd4;
+        margin-bottom: 20px;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: auto;
+        background: rgba(30, 30, 30, 0.9);
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 0 20px #00bcd4;
+        animation: fadeIn 1s ease;
+      }
+
+      .section {
+        margin-bottom: 25px;
+        transition: transform 0.3s ease;
+      }
+
+      .section:hover {
+        transform: scale(1.02);
+      }
+
+      .label {
+        font-size: 1.1em;
+        margin-bottom: 10px;
+        display: block;
+      }
+
+      button, input[type=range] {
+        width: 100%;
+        padding: 10px;
+        font-size: 1em;
+        border: none;
+        border-radius: 5px;
+        margin-top: 5px;
+        transition: all 0.3s ease;
+      }
+
+      button {
+        background-color: #00bcd4;
+        color: #000;
+        cursor: pointer;
+        box-shadow: 0 0 8px #00bcd4;
+      }
+
+      button:hover {
+        background-color: #00acc1;
+        transform: scale(1.03);
+      }
+
+      .tank, .battery {
+        height: 150px;
+        width: 100%;
+        background: #333;
+        border-radius: 10px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .fill {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        background: #00bcd4;
+        transition: height 0.5s ease;
+      }
+
+      .percent-label {
+        position: absolute;
+        width: 100%;
+        text-align: center;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.2em;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>🌊 F.L.O.A.T. Dashboard</h2>
+
+      <div class="section">
+        <span class="label">Filter Water Pump</span>
+        <button onclick="fetch('/togglePump')">Toggle Pump</button>
+      </div>
+
+      <div class="section">
+        <span class="label">Thrust Fan Speed</span>
+        <input type="range" min="0" max="100" step="25" onchange="setSpeed(this.value)">
+      </div>
+
+      <div class="section">
+        <span class="label">Solar Panel Cleaner</span>
+        <button onclick="fetch('/toggleSolar')">Clean Panels</button>
+      </div>
+
+      <div class="section">
+        <span class="label">Battery Level</span>
+        <div class="battery">
+          <div class="fill" id="batteryFill" style="height: 0%;"></div>
+          <div class="percent-label" id="batteryPercent">0%</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <span class="label">Water Tank Level</span>
+        <div class="tank">
+          <div class="fill" id="tankFill" style="height: 0%;"></div>
+          <div class="percent-label" id="tankPercent">0%</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function setSpeed(val) {
+        fetch('/setSpeed?val=' + val);
+      }
+
+      function togglePump() {
+        fetch('/togglePump');
+      }
+
+      function toggleSolar() {
+        fetch('/toggleSolar');
+      }
+
+      setInterval(() => {
+        fetch('/status')
+          .then(res => res.json())
+          .then(data => {
+            document.getElementById("batteryFill").style.height = data.battery + "%";
+            document.getElementById("batteryPercent").innerText = data.battery + "%";
+            document.getElementById("tankFill").style.height = data.water + "%";
+            document.getElementById("tankPercent").innerText = data.water + "%";
+          });
+      }, 2000);
+    </script>
+  </body>
+  </html>
