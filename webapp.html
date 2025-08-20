@@ -1,163 +1,84 @@
 <!DOCTYPE html>
-  <html lang="en">
+  <html>
   <head>
-    <meta charset="UTF-8" />
-    <title>F.L.O.A.T. Dashboard</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>F.L.O.A.T Dashboard</title>
     <style>
-      body {
-        margin: 0;
-        padding: 20px;
-        font-family: 'Segoe UI', sans-serif;
-        background-color: #000000;
-        background-size: cover;
-        color: white;
-      }
-
-      h2 {
-        text-align: center;
-        color: #00bcd4;
-        margin-bottom: 20px;
-      }
-
-      .container {
-        max-width: 600px;
-        margin: auto;
-        background: rgba(30, 30, 30, 0.9);
-        border-radius: 10px;
-        padding: 20px;
-        box-shadow: 0 0 20px #00bcd4;
-        animation: fadeIn 1s ease;
-      }
-
-      .section {
-        margin-bottom: 25px;
-        transition: transform 0.3s ease;
-      }
-
-      .section:hover {
-        transform: scale(1.02);
-      }
-
-      .label {
-        font-size: 1.1em;
-        margin-bottom: 10px;
-        display: block;
-      }
-
-      button, input[type=range] {
-        width: 100%;
-        padding: 10px;
-        font-size: 1em;
-        border: none;
-        border-radius: 5px;
-        margin-top: 5px;
-        transition: all 0.3s ease;
-      }
-
-      button {
-        background-color: #00bcd4;
-        color: #000;
-        cursor: pointer;
-        box-shadow: 0 0 8px #00bcd4;
-      }
-
-      button:hover {
-        background-color: #00acc1;
-        transform: scale(1.03);
-      }
-
-      .tank, .battery {
-        height: 150px;
-        width: 100%;
-        background: #333;
-        border-radius: 10px;
-        position: relative;
-        overflow: hidden;
-      }
-
-      .fill {
-        position: absolute;
-        bottom: 0;
-        width: 100%;
-        background: #00bcd4;
-        transition: height 0.5s ease;
-      }
-
-      .percent-label {
-        position: absolute;
-        width: 100%;
-        text-align: center;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 1.2em;
-      }
-
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
+      body { margin:0; padding:20px; font-family:Arial; background:black; color:white; text-align:center; }
+      h1 { color:#00bcd4; text-shadow:0 0 10px #00bcd4; }
+      .section { margin:20px auto; padding:15px; max-width:600px; background:#111; border-radius:10px; box-shadow:0 0 15px #00bcd4; }
+      button { padding:10px 20px; margin:10px; border:none; border-radius:8px; cursor:pointer; font-size:18px; }
+      .pump-btn { background:#00bcd4; color:black; }
+      .led-btn { background:#007bff; color:white; }
+      .off-btn { background:#ff3b30; color:white; }
+      .tank { width:100%; height:150px; background:#333; border-radius:10px; overflow:hidden; position:relative; }
+      .fill { position:absolute; bottom:0; width:100%; background:#00bcd4; transition:height 0.5s ease; }
+      .percent-label { position:absolute; width:100%; top:50%; transform:translateY(-50%); font-size:1.5em; }
+      input[type=range] { width:80%; }
     </style>
   </head>
   <body>
-    <div class="container">
-      <h2>🌊 F.L.O.A.T. Dashboard</h2>
+    <h1>🌊 F.L.O.A.T Dashboard🌊</h1>
 
-      <div class="section">
-        <span class="label">Filter Water Pump</span>
-        <button onclick="fetch('/togglePump')">Toggle Pump</button>
-      </div>
+    <!-- Pump Section -->
+    <div class="section">
+      <h2>Filter Pump</h2>
+      <button class="pump-btn" onclick="togglePump()">Toggle Pump</button>
+      <div id="pumpStatus">Pump: OFF</div>
+    </div>
 
-      <div class="section">
-        <span class="label">Thrust Fan Speed</span>
-        <input type="range" min="0" max="100" step="25" onchange="setSpeed(this.value)">
-      </div>
-
-      <div class="section">
-        <span class="label">Solar Panel Cleaner</span>
-        <button onclick="fetch('/toggleSolar')">Clean Panels</button>
-      </div>
-
-      <div class="section">
-        <span class="label">Battery Level</span>
-        <div class="battery">
-          <div class="fill" id="batteryFill" style="height: 0%;"></div>
-          <div class="percent-label" id="batteryPercent">0%</div>
-        </div>
-      </div>
-
-      <div class="section">
-        <span class="label">Water Tank Level</span>
-        <div class="tank">
-          <div class="fill" id="tankFill" style="height: 0%;"></div>
-          <div class="percent-label" id="tankPercent">0%</div>
-        </div>
+    <!-- Water Tank -->
+    <div class="section">
+      <h2>Water Tank Level</h2>
+      <div class="tank">
+        <div class="fill" id="tankFill" style="height:0%;"></div>
+        <div class="percent-label" id="tankPercent">0%</div>
       </div>
     </div>
 
+    <!-- Servo -->
+    <div class="section">
+      <h2>Servo Control</h2>
+      <p>Position: <span id="servoVal">90</span>°</p>
+      <input type="range" min="0" max="180" value="90" id="servoSlider" oninput="updateServo(this.value)">
+    </div>
+
+    <!-- LED Matrix -->
+    <div class="section">
+      <h2>LED Matrix</h2>
+      <button class="led-btn" onclick="setMsg('FLOAT')">FLOAT</button>
+      <button class="led-btn" onclick="setMsg('HI!')">HI!</button>
+      <button class="led-btn" onclick="setMsg('HELLO')">HELLO</button>
+      <button class="off-btn" onclick="setMsg('OFF')">OFF</button>
+      <br><br>
+      <input type="color" id="colorWheel" value="#00ff00" onchange="setColor(this.value)">
+    </div>
+
     <script>
-      function setSpeed(val) {
-        fetch('/setSpeed?val=' + val);
-      }
-
       function togglePump() {
-        fetch('/togglePump');
+        fetch('/togglePump').then(r=>r.text()).then(status=>{
+          document.getElementById("pumpStatus").innerText = "Pump: " + status;
+        });
       }
-
-      function toggleSolar() {
-        fetch('/toggleSolar');
+      function updateServo(val) {
+        document.getElementById("servoVal").innerText = val;
+        fetch('/setServo?value=' + val);
       }
-
-      setInterval(() => {
-        fetch('/status')
-          .then(res => res.json())
-          .then(data => {
-            document.getElementById("batteryFill").style.height = data.battery + "%";
-            document.getElementById("batteryPercent").innerText = data.battery + "%";
-            document.getElementById("tankFill").style.height = data.water + "%";
-            document.getElementById("tankPercent").innerText = data.water + "%";
-          });
-      }, 2000);
+      function setMsg(msg) {
+        fetch('/setMsg?text='+msg);
+      }
+      function setColor(hex) {
+        var r = parseInt(hex.substr(1,2),16);
+        var g = parseInt(hex.substr(3,2),16);
+        var b = parseInt(hex.substr(5,2),16);
+        fetch(`/setColor?r=${r}&g=${g}&b=${b}`);
+      }
+      setInterval(()=>{
+        fetch('/status').then(r=>r.json()).then(data=>{
+          document.getElementById("tankFill").style.height = data.water+"%";
+          document.getElementById("tankPercent").innerText = data.water+"%";
+          document.getElementById("pumpStatus").innerText = "Pump: "+(data.pump?"ON":"OFF");
+        });
+      },1000);
     </script>
   </body>
   </html>
